@@ -6,7 +6,10 @@ const authMiddleware = require("../middleware/middleware");
 router.post('/api/register',controller.register);
 router.post('/api/login',controller.login);
 
-router.post('/example', authMiddleware, controller.example);
+router.post('/api/add-home',authMiddleware,controller.addHome);
+router.get('/api/display-homes', authMiddleware,controller.displayHomes);
+
+router.post('/example',  controller.example);
 
 
 module.exports = router; 

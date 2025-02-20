@@ -21,6 +21,7 @@ const authMiddleware = (req, res, next) => {
         const verified = jwt.verify(token, process.env.JWT_SECRET);
         req.user = verified; // Attach user data to request object
 
+        console.log("Middleware tick");
         next(); // Continue to next middleware/controller
     } catch (err) {
         console.error("JWT Verification Error:", err.message);
@@ -29,3 +30,9 @@ const authMiddleware = (req, res, next) => {
 };
 
 module.exports = authMiddleware;
+
+
+//auth header syntax
+  // headers: {
+  //     Authorization: `Bearer ${token}`,  // Send token in header
+  // },

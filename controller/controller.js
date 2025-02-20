@@ -1,9 +1,11 @@
 require("dotenv").config(); 
+const mongoose = require("mongoose");
 const express = require('express');
 const Users = require("../model/schema");
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
 const saltrounds = 10;
+
 
 exports.register = async (req, res, next) => {
     try {
@@ -82,17 +84,77 @@ exports.register = async (req, res, next) => {
     }
 };
 
-exports.example = async (req, res, next) => {
-  //logout logic
+exports.addHome = async (req, res, next) => {
+  try {
+    const { longitude, latitude } = req.body;
+    const userId = req.user.id; // Extracted from token
 
-  //add remove token
-  
+    
+    if (!longitude || !latitude || !userId) {
+      return res.status(400).json({ status: "failed", message: "Longitude, latitude, or user ID is missing" });
+    }
+
+    const home = {
+      home_id: new mongoose.Types.ObjectId(), // Unique ID for each home
+      longitude,
+      latitude
+    };
+
+    const homeQuery = await Users.updateOne(
+      { _id: userId },  // Ensure you're using `_id` from MongoDB
+      { $push: { homes: home } }
+    );
+
+    if (homeQuery.modifiedCount === 0) {
+      return res.status(404).json({ status: "failed", message: "User not found" });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Home added successfully",
+      home
+    });
+
+  } catch (error) {
+    next(error);
+  }
 };
+
+exports.displayHomes = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    if (!userId) {
+      return res.status(400).json({ status: "failed", message: "Access Denied" });
+    }
+
+    const user = await Users.findById(userId).select("homes");
+
+    if (!user) {
+      return res.status(404).json({ status: "failed", message: "User not found." });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Homes retrieved successfully",
+      homes: user.homes
+    });
+  
+  } catch (error) {
+    console.error("Error retrieving homes:", error);
+    res.status(500).json({ status: "failed", message: "Internal Server Error" });
+  }
+};
+
   
 
 
 exports.example = async (req, res, next) => {
 console.log('example');
 };
+
+
+
+
 
  
