@@ -146,9 +146,7 @@ exports.displayHomes = async (req, res, next) => {
   }
 };
 
-  
-
-
+   
 exports.example = async (req, res, next) => {
 console.log('example');
 };
